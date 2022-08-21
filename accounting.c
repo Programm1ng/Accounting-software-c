@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "colors.h"
 
 const char *CLIENTS_DIRECTORY = "./clients/";
 
@@ -42,7 +43,18 @@ void displayClients() {
     printf("ID: %d\n", client->id);
     printf("Firstname: %s\n", client->firstname);
     printf("Lastname: %s\n", client->lastname);
+    
+    // If the balance is negative, print balance in red, else in green
+    if(client->balance >= 0) {
+      printf("%s", KGRN);
+    } else {
+      printf("%s", KRED);
+    }
     printf("Balance: %.2f€\n", client->balance);
+    
+    // Reset console color to normal
+    printf("%s", KNRM);
+
     printf("-------------------------------------------\n\n");
     client = client->next;
   }
