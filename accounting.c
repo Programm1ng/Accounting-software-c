@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 const char *CLIENTS_DIRECTORY = "./clients/";
 
@@ -12,9 +13,7 @@ client_t *lastClient = NULL;
 void initClients() {
 
   DIR *d;
-
   struct dirent *dir;
-
   d = opendir(CLIENTS_DIRECTORY);
 
   if (d) {
@@ -22,34 +21,91 @@ void initClients() {
     while((dir = readdir(d)) != NULL) {
 
       if (isClientFile(dir->d_name)) {
-
         char *filePath = getFilePath(dir->d_name);
-
         char *fileContent = getFileContent(filePath);
-
-        addClient(fileContent);
+        client_t *client = getClientFromFile(fileContent);
+        addClientToLinkedList(client);
       }
-
     }
-
   }
-
 }
 
 void displayClients() {
   client_t *client = firstClient;
 
+  if (client == NULL) {
+    printf("No clients yet");
+    return;
+  }
+
   while (client != NULL) {
     printf("ID: %d\n", client->id);
     printf("Firstname: %s\n", client->firstname);
     printf("Lastname: %s\n", client->lastname);
-    printf("Balance: %.2f€\n ", client->balance);
-    printf("-------------------------------------------\n");
+    printf("Balance: %.2f€\n", client->balance);
+    printf("-------------------------------------------\n\n");
     client = client->next;
   }
 }
 
-static void addClient(char *fileContent) {
+void createNewClient() {
+
+  client_t *client = (client_t*)malloc(sizeof(client_t));
+
+  client->id = getNewClientId();
+  
+  char firstname[50];
+  printf("Please enter the firstname\n");
+  scanf("%s", firstname);
+  strcpy(client->firstname, firstname);
+
+  char lastname[50];
+  printf("Please enter the lastname\n");
+  scanf("%s", lastname);
+  strcpy(client->lastname, lastname);
+
+  printf("Please enter the balance\n");
+  scanf("%f", &client->balance);
+  
+  char *fileName = createFileName(client->id);
+
+  char *filePath = getFilePath(fileName);
+
+  free(fileName);
+
+  writeClientToFile(filePath, client);
+}
+
+static int getNewClientId() {
+
+  int newId = 0;
+  
+  client_t *client = firstClient;
+
+  while(client != NULL) {
+    
+    if (client->id > newId) {
+      newId = client->id + 1;
+    }
+
+    client = client->next;
+  }
+
+  return newId;
+}
+
+static char *createFileName(int clientId) {
+
+  char *str = (char*)malloc(30 * sizeof(char));
+
+  sprintf(str, "%d", clientId);
+
+  strcat(str, ".txt\0");
+
+  return str;
+}
+
+static client_t *getClientFromFile(char *fileContent) {
 
   /* The delimeter */
 	char delim[] = ";";
@@ -65,11 +121,11 @@ static void addClient(char *fileContent) {
   ptr = strtok(NULL, delim);
   
   // Get the client firstname
-  newClient->firstname = ptr;
+  strcpy(newClient->firstname, ptr);
   ptr = strtok(NULL, delim);
   
   // Get the client lastname
-  newClient->lastname = ptr;
+  strcpy(newClient->lastname, ptr);
   ptr = strtok(NULL, delim);
   
   /* Get the client balance */
@@ -78,12 +134,16 @@ static void addClient(char *fileContent) {
 
   newClient->next = NULL;
 
+  return newClient;
+}
+
+static void addClientToLinkedList(client_t *client) {
   if (firstClient == NULL) {
-    firstClient = newClient;
-    lastClient = newClient;
+    firstClient = client;
+    lastClient = client;
   } else {
-    lastClient->next = newClient;
-    lastClient = newClient;
+    lastClient->next = client;
+    lastClient = client;
   }
 }
 
@@ -131,4 +191,13 @@ static int isClientFile(char * fileName) {
     return 1;
   else
     return 0;
+}
+
+static void writeClientToFile(char *filePath, client_t *client) {
+  
+  FILE *fpointer = fopen(filePath, "w");
+
+  fprintf(fpointer, "%d;%s;%s;%.2f", client->id, client->firstname, client->lastname, client->balance);
+
+  fclose(fpointer);
 }

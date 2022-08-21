@@ -31,7 +31,14 @@ void displayClients();
  * 
  * @param fileContent 
  */
-static void addClient(char* fileContent);
+static client_t *getClientFromFile(char* fileContent);
+
+/**
+ * @brief Adds a client object to the linked list of clients
+ * 
+ * @param client 
+ */
+static void addClientToLinkedList(client_t *client);
 
 /**
  * @brief Loads the content of a client file
@@ -56,3 +63,33 @@ static char *getFilePath(char *fileName);
  * @return int 1 if it is a client file, 0 if not
  */
 static int isClientFile(char * fileName);
+
+
+/**
+ * @brief Given a client obj and creates a file name for that client
+ * 
+ * @param int 
+ * @return char* the filename
+ */
+static char *createFileName(int clientId);
+
+/**
+ * @brief Creates a new client
+ * 
+ */
+void createNewClient();
+
+/**
+ * @brief Get a new id for a new client
+ * 
+ * @return int 
+ */
+static int getNewClientId();
+
+/**
+ * @brief Saves a client object into a client text file
+ * 
+ * @param filePath 
+ * @param client 
+ */
+static void writeClientToFile(char *filePath, client_t *client);
