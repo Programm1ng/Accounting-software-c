@@ -34,7 +34,7 @@ void displayClients() {
   client_t *client = firstClient;
 
   if (client == NULL) {
-    printf("No clients yet");
+    printf("No clients yet\n");
     return;
   }
 
@@ -74,6 +74,8 @@ void createNewClient() {
   free(fileName);
 
   writeClientToFile(filePath, client);
+
+  addClientToLinkedList(client);
 }
 
 static int getNewClientId() {
@@ -84,7 +86,7 @@ static int getNewClientId() {
 
   while(client != NULL) {
     
-    if (client->id > newId) {
+    if (client->id >= newId) {
       newId = client->id + 1;
     }
 
