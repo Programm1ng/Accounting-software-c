@@ -24,8 +24,9 @@ void displayMenu() {
   printf("Please choose an action by typing in the number and press enter\n");
   printf("1 Show clients\n");
   printf("2 Create client\n");
-  printf("3 Make a transaction\n");
-  printf("4 Exit\n");
+  printf("3 Show transactions of a client\n");
+  printf("4 Make a transaction\n");
+  printf("5 Exit\n");
 }
 
 /**
@@ -71,8 +72,23 @@ int main() {
     } else if (option == 2) {
       createNewClient();
     } else if (option == 3) {
-
+      printf("Please enter the id of the client\n");
+      int clientId = getInput();
+      showTransaction(clientId);
     } else if (option == 4) {
+      
+      printf("Pay from client id:\n");
+      int fromClientId = getInput();
+      
+      printf("Pay to client id:\n");
+      int toClientId = getInput();
+      
+      // Ask for amount of money
+
+      // Call makeTransaction
+
+    } else if (option == 5) {
+
       return EXIT_SUCCESS;
     }
 

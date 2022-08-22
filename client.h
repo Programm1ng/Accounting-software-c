@@ -1,5 +1,5 @@
 /**
- * @file client_t.h
+ * @file client.h
  * @author Programm1ng
  * @brief Holds the structure for a client
  * @version 0.1
@@ -9,15 +9,18 @@
  * 
  */
 
+#include "transaction.h"
+
 #ifndef CLIENT_HEADER
 #define CLIENT_HEADER
 
-typedef struct client {
+typedef struct Client {
   int id;
   char firstname[50];
   char lastname[50];
   float balance;
-  struct client * next;
-} client_t;
+  TransactionsArray *ta;
+  struct Client * next;
+} Client;
 
 #endif

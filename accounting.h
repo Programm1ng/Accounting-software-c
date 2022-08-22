@@ -9,14 +9,15 @@
  * 
  */
 
-#include "client_t.h"
+#include "client.h"
+#include "transaction.h"
 
 extern const char *CLIENTS_DIRECTORY;
 
 /**
  * @brief Load all clients from files
  * 
- * @return client_t* 
+ * @return Client* 
  */
 void initClients();
 
@@ -27,18 +28,18 @@ void initClients();
 void displayClients();
 
 /**
- * @brief Given the content of a client file creates a new client_t object
+ * @brief Given the content of a client file creates a new Client object
  * 
  * @param fileContent 
  */
-static client_t *getClientFromFile(char* fileContent);
+static Client *getClientFromFile(char* fileContent);
 
 /**
  * @brief Adds a client object to the linked list of clients
  * 
  * @param client 
  */
-static void addClientToLinkedList(client_t *client);
+static void addClientToLinkedList(Client *client);
 
 /**
  * @brief Loads the content of a client file
@@ -92,4 +93,28 @@ static int getNewClientId();
  * @param filePath 
  * @param client 
  */
-static void writeClientToFile(char *filePath, client_t *client);
+static void writeClientToFile(char *filePath, Client *client);
+
+/**
+ * @brief Prints all transactions of a client on the terminal
+ * 
+ * @param client 
+ */
+void showTransaction(int clientId);
+
+/**
+ * @brief Get a Client obj by its ID
+ * 
+ * @param clientId 
+ * @return Client* 
+ */
+static Client *getClientById(int clientId);
+
+/**
+ * @brief Makes a transaction from a client to another client, returns 0 if successful otherwise returns 1
+ * 
+ * @param fromClientId 
+ * @param toClientId 
+ * @return int
+ */
+int makeTransaction(int fromClientId, int toClientId);
