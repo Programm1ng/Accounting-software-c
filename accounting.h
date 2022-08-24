@@ -108,7 +108,7 @@ static void writeClientToFile(char *filePath, Client *client);
  * 
  * @param client 
  */
-void displayTransactions(int clientId);
+void displayTransactions();
 
 /**
  * @brief Prints a transaction on the terminal
@@ -133,7 +133,7 @@ static Client *getClientById(int clientId);
  * @param amount 
  * @return int
  */
-int makeTransaction(int fromClientId, int toClientId, double amount);
+int makeTransaction();
 
 /**
  * @brief Saves a transaction to a client file

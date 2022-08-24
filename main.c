@@ -20,6 +20,7 @@
  * 
  */
 void displayMenu() {
+  printf("\n");
   printf("Please choose an action by typing in the number and press enter\n");
   printf("1 Show clients\n");
   printf("2 Create client\n");
@@ -35,37 +36,30 @@ void displayMenu() {
  */
 int main() {
   
+  // Loads clients and transactions into the program
   initClients();
   
   while(1) {
 
+    // Display the menu so the user can choose an action
     displayMenu();
+
+    // Declare a int variable to save the user input
     int option;
+
+    // Get the user input
     scanf("%d", &option);
     
+    // Check which action the user has choosen
     if (option == 1) {
       displayClients();
     } else if (option == 2) {
       createNewClient();
     } else if (option == 3) {
       int clientId = 0;
-      printf("Please enter the id of the client\n");
-      scanf("%d", &clientId);
-      displayTransactions(clientId);
+      displayTransactions();
     } else if (option == 4) {
-      int fromClientId, toClientId = 0;
-      printf("Pay from client id:\n");
-      scanf("%d", &fromClientId);
-      
-      printf("Pay to client id:\n");
-      scanf("%d", &toClientId);
-      
-      double amount = -1;
-      printf("Please enter the amount of money you want to send\n");
-      scanf("%lf", &amount);
-
-      makeTransaction(fromClientId, toClientId, amount);
-
+      makeTransaction();
     } else {
       return EXIT_SUCCESS;
     }

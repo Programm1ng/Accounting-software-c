@@ -14,6 +14,7 @@ Client *lastClient = NULL;
 
 void initClients() {
 
+  // Declare a variable to hold a stream to a directory
   DIR *d;
   struct dirent *dir;
   d = opendir(CLIENTS_DIRECTORY);
@@ -98,11 +99,15 @@ void createNewClient() {
 
   char *filePath = getFilePath(fileName);
 
-  free(fileName);
-
   writeClientToFile(filePath, client);
 
   addClientToLinkedList(client);
+
+  free(fileName);
+
+  free(filePath);
+
+  printf("%sCreated new client %s %s%s\n", KGRN, client->firstname, client->lastname, KNRM);
 }
 
 static int getNewClientId() {
@@ -257,7 +262,11 @@ static void writeClientToFile(char *filePath, Client *client) {
   fclose(fpointer);
 }
 
-void displayTransactions(int clientId) {
+void displayTransactions() {
+
+  int clientId;
+  printf("Please enter the id of the client\n");
+  scanf("%d", &clientId);
   
   Client *selectedClient = getClientById(clientId);
 
@@ -265,7 +274,8 @@ void displayTransactions(int clientId) {
   
   size_t size = selectedClient->ta->size;
 
-  printf("################################################\n");
+  printf("\n");
+  printf("---------------------------------------------\n");
   
   printf("%s %s - Transactions\n\n", selectedClient->firstname, selectedClient->lastname);
   
@@ -276,7 +286,7 @@ void displayTransactions(int clientId) {
     displayTransaction(transaction);
   }
 
-  printf("################################################\n");
+  printf("---------------------------------------------\n");
 }
 
 static void displayTransaction(Transaction *transaction) {
@@ -324,7 +334,18 @@ static Client* getClientById(int clientId) {
   return NULL;
 }
 
-int makeTransaction(int fromClientId, int toClientId, double amount) {
+int makeTransaction() {
+
+  int fromClientId, toClientId = 0;
+  printf("Pay from client id:\n");
+  scanf("%d", &fromClientId);
+  
+  printf("Pay to client id:\n");
+  scanf("%d", &toClientId);
+  
+  double amount = -1;
+  printf("Please enter the amount of money you want to send\n");
+  scanf("%lf", &amount);
 
   if (fromClientId == toClientId) {
     printf("%sA client cannot pay himself%s\n", KRED, KNRM);
