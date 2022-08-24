@@ -10,16 +10,13 @@ TransactionsArray *newTransactionsArray() {
 
 Transaction *newTransaction() {
   Transaction *transaction = malloc(sizeof(Transaction));
-  transaction->day = 0;
-  transaction->month = 0;
-  transaction->year = 0;
   return transaction;
 }
 
 void insertTransaction(TransactionsArray *ta, Transaction *transaction) {
-  ta->transactions = realloc(ta->transactions, ta->size * sizeof(Transaction));
-  ta->transactions[ta->size] = *transaction;
   ta->size += 1;
+  ta->transactions = realloc(ta->transactions, ta->size * sizeof(Transaction));
+  ta->transactions[ta->size-1] = *transaction;
 }
 
 void freeTransactionsArray(TransactionsArray *ta) {

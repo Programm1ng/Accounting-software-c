@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "colors.h"
 
 const char *CLIENTS_DIRECTORY = "./clients/";
@@ -26,6 +27,8 @@ void initClients() {
         char *fileContent = getFileContent(filePath);
         Client *client = getClientFromFile(fileContent);
         addClientToLinkedList(client);
+        free(filePath);
+        free(fileContent);
       }
     }
   }
@@ -43,20 +46,8 @@ void displayClients() {
   printf("################################################\n");
 
   while (client != NULL) {
-    printf("ID: %d\n", client->id);
-    printf("Firstname: %s\n", client->firstname);
-    printf("Lastname: %s\n", client->lastname);
     
-    // If the balance is negative, print balance in red, else in green
-    if(client->balance >= 0) {
-      printf("%s", KGRN);
-    } else {
-      printf("%s", KRED);
-    }
-    printf("Balance: %.2f€\n", client->balance);
-    
-    // Reset console color to normal
-    printf("%s", KNRM);
+    displayClient(client);
 
     if (client->next != NULL) {
       printf("-------------------------------------------\n");
@@ -65,6 +56,23 @@ void displayClients() {
   }
 
   printf("################################################\n");
+}
+
+static void displayClient(Client *client) {
+  printf("ID: %d\n", client->id);
+  printf("Firstname: %s\n", client->firstname);
+  printf("Lastname: %s\n", client->lastname);
+  
+  // If the balance is negative, print balance in red, else in green
+  if(client->balance >= 0) {
+    printf("%s", KGRN);
+  } else {
+    printf("%s", KRED);
+  }
+  printf("Balance: %.2f€\n", client->balance);
+  
+  // Reset console color to normal
+  printf("%s", KNRM);
 }
 
 void createNewClient() {
@@ -84,7 +92,7 @@ void createNewClient() {
   strcpy(client->lastname, lastname);
 
   printf("Please enter the balance\n");
-  scanf("%f", &client->balance);
+  scanf("%lf", &client->balance);
   
   char *fileName = createFileName(client->id);
 
@@ -170,21 +178,6 @@ static Client *getClientFromFile(char *fileContent) {
 
     ptr = strtok(NULL, delim);
 
-    // The Day of the transaction
-    transaction->day = atoi(ptr);
-
-    ptr = strtok(NULL, delim);
-
-    // The Month of the transaction
-    transaction->month = atoi(ptr);
-
-    ptr = strtok(NULL, delim);
-
-    // The Year of the transaction
-    transaction->year = atoi(ptr);
-
-    ptr = strtok(NULL, delim);
-
     // The Amount of the transaction
     transaction->amount = atof(ptr);
 
@@ -192,7 +185,6 @@ static Client *getClientFromFile(char *fileContent) {
 
     // Add transaction to the transactions array of the client
     insertTransaction(newClient->ta, transaction);
-
   }
 
   newClient->next = NULL;
@@ -260,12 +252,12 @@ static void writeClientToFile(char *filePath, Client *client) {
   
   FILE *fpointer = fopen(filePath, "w");
 
-  fprintf(fpointer, "%d;%s;%s;%.2f", client->id, client->firstname, client->lastname, client->balance);
+  fprintf(fpointer, "%d;%s;%s;%.2f;", client->id, client->firstname, client->lastname, client->balance);
 
   fclose(fpointer);
 }
 
-void showTransaction(int clientId) {
+void displayTransactions(int clientId) {
   
   Client *selectedClient = getClientById(clientId);
 
@@ -275,35 +267,45 @@ void showTransaction(int clientId) {
 
   printf("################################################\n");
   
-  printf("Transactions\n");
+  printf("%s %s - Transactions\n\n", selectedClient->firstname, selectedClient->lastname);
   
   for (int i = 0; i < size; i++) {
     
     Transaction *transaction = &selectedClient->ta->transactions[i];
 
-    Client *otherClient = getClientById(transaction->otherClientId);
-
-    // Income
-    if (transaction->type == 0) {
-      printf("%s", KGRN);
-      printf("Received ");
-    } 
-    // Outcome
-    else {
-      printf("Paid ");
-      printf("%s", KRED);
-    }
-
-    printf("+%.2f ", transaction->amount);
-
-    printf("%s", KNRM);
-
-    if (otherClient != NULL) {
-      printf("from %s %s\n", otherClient->firstname, otherClient->lastname);
-    }
+    displayTransaction(transaction);
   }
 
   printf("################################################\n");
+}
+
+static void displayTransaction(Transaction *transaction) {
+  // Income
+  if (transaction->type == 0) {
+    printf("%s", KGRN);
+    printf("Received +%.2lf€ ", transaction->amount);
+  } 
+  // Outcome
+  else {
+    printf("%s", KRED);
+    printf("Paid -%.2lf€ ", transaction->amount);
+  }
+
+  // Reset terminal text color to default
+  printf("%s", KNRM);
+
+  Client *otherClient = getClientById(transaction->otherClientId);
+
+  if (transaction->type == 0) {
+    printf("from ");
+  } else {
+    printf("to ");
+  }
+  if (otherClient != NULL) { 
+    printf("%s %s\n", otherClient->firstname, otherClient->lastname);
+  } else {
+    printf("%s\n", "Unknown");
+  }
 }
 
 static Client* getClientById(int clientId) {
@@ -311,7 +313,6 @@ static Client* getClientById(int clientId) {
   Client *client = firstClient;
 
   if (client == NULL) {
-    printf("No clients yet\n");
     return NULL;
   }
 
@@ -323,10 +324,15 @@ static Client* getClientById(int clientId) {
   return NULL;
 }
 
-int makeTransaction(int fromClientId, int toClientId) {
+int makeTransaction(int fromClientId, int toClientId, double amount) {
 
   if (fromClientId == toClientId) {
-    printf("A client cannot pay himself");
+    printf("%sA client cannot pay himself%s\n", KRED, KNRM);
+    return 1;
+  }
+
+  if (amount <= 0) {
+    printf("%sThe amount must be greater than zero%s\n", KRED, KNRM);
     return 1;
   }
   
@@ -335,18 +341,77 @@ int makeTransaction(int fromClientId, int toClientId) {
   Client *toClient = getClientById(toClientId);
 
   if (fromClient == NULL) {
-    printf("Client who shall pay does not exist");
+    printf("%sClient who shall pay does not exist%s\n", KRED, KNRM);
     return 1;
   }
 
   if (toClient == NULL) {
-    printf("Client who shall receive the payment does not exist");
+    printf("%sClient who shall receive the payment does not exist%s\n", KRED, KNRM);
     return 1;
   }
 
-  // Make new transaction object for both clients
+  if (fromClient->balance - amount < 0) {
+    printf("%sClient who shall pay does not have enough money\n%s", KRED, KNRM);
+    return 1;
+  }
 
-  // Update Client Files if successful
+  fromClient->balance -= amount;
+  toClient->balance += amount;
+
+  printf("Make payment from %s %s to %s %s\n", fromClient->firstname, fromClient->lastname, toClient->firstname, toClient->lastname);
+
+  // Make new transaction object for sender
+  Transaction *transactionSender = newTransaction();
+  transactionSender->type = 1;
+  transactionSender->otherClientId = toClientId;
+  transactionSender->amount = amount;
+
+  insertTransaction(fromClient->ta, transactionSender);
+
+  // Make new transaction object for receiver
+  Transaction *transactionReceiver = newTransaction();
+  transactionReceiver->type = 0;
+  transactionReceiver->otherClientId = fromClientId;
+  transactionReceiver->amount = amount;
+
+  insertTransaction(toClient->ta, transactionReceiver);
+
+  updateClientFile(fromClient);
+  updateClientFile(toClient);
 
   return 0;
+}
+
+static void saveTransactionToFile(Client *client, Transaction *transaction) {
+
+  char *fileName = createFileName(client->id);
+
+  char *filePath = getFilePath(fileName);
+
+  FILE *fpointer = fopen(filePath, "a");
+
+  fprintf(fpointer, "%d/%d/%.2lf;", transaction->type, transaction->otherClientId, transaction->amount);
+
+  fclose(fpointer);
+}
+
+static void updateClientFile(Client *client) {
+
+  char *fileName = createFileName(client->id);
+
+  char *filePath = getFilePath(fileName);
+
+  remove(filePath);
+
+  writeClientToFile(filePath, client);
+
+  if (client->ta != NULL) {
+    for(int i = 0; i < client->ta->size; i++) {
+      saveTransactionToFile(client, &client->ta->transactions[i]);
+    }
+  }
+
+  free(fileName);
+
+  free(filePath);
 }

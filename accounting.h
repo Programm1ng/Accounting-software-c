@@ -9,6 +9,7 @@
  * 
  */
 
+#include <time.h>
 #include "client.h"
 #include "transaction.h"
 
@@ -26,6 +27,13 @@ void initClients();
  * 
  */
 void displayClients();
+
+/**
+ * @brief Prints a given client on the terminal
+ * 
+ * @param *client
+ */
+static void displayClient(Client *client);
 
 /**
  * @brief Given the content of a client file creates a new Client object
@@ -100,7 +108,14 @@ static void writeClientToFile(char *filePath, Client *client);
  * 
  * @param client 
  */
-void showTransaction(int clientId);
+void displayTransactions(int clientId);
+
+/**
+ * @brief Prints a transaction on the terminal
+ * 
+ * @param transaction 
+ */
+static void displayTransaction(Transaction *transaction);
 
 /**
  * @brief Get a Client obj by its ID
@@ -115,6 +130,21 @@ static Client *getClientById(int clientId);
  * 
  * @param fromClientId 
  * @param toClientId 
+ * @param amount 
  * @return int
  */
-int makeTransaction(int fromClientId, int toClientId);
+int makeTransaction(int fromClientId, int toClientId, double amount);
+
+/**
+ * @brief Saves a transaction to a client file
+ * 
+ * @param client 
+ * @param transaction 
+ */
+static void saveTransactionToFile(Client *client, Transaction *transaction);
+
+/**
+ * @brief Update a client file
+ * 
+ */
+static void updateClientFile(Client *client);

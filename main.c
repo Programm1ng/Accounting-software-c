@@ -15,7 +15,6 @@
 #include <string.h>
 #include "accounting.h"
 
-
 /**
  * @brief Show menu to let the user choose an action
  * 
@@ -30,29 +29,6 @@ void displayMenu() {
 }
 
 /**
- * @brief Receive input of user for menu selection
- * 
- * @return int 
- */
-int getInput() {
-  char *end;
-  char buf[20];
-  int n;
-
-  do {
-      if (!fgets(buf, sizeof buf, stdin))
-          break;
-
-      // remove \n
-      buf[strlen(buf) - 1] = 0;
-
-      n = strtol(buf, &end, 10);
-  } while (end != buf + strlen(buf));
-
-  return n;
-}
-
-/**
  * @brief Main entry point of the program
  * 
  * @return int 
@@ -64,36 +40,35 @@ int main() {
   while(1) {
 
     displayMenu();
-    
-    int option =  getInput();
+    int option;
+    scanf("%d", &option);
     
     if (option == 1) {
       displayClients();
     } else if (option == 2) {
       createNewClient();
     } else if (option == 3) {
+      int clientId = 0;
       printf("Please enter the id of the client\n");
-      int clientId = getInput();
-      showTransaction(clientId);
+      scanf("%d", &clientId);
+      displayTransactions(clientId);
     } else if (option == 4) {
-      
+      int fromClientId, toClientId = 0;
       printf("Pay from client id:\n");
-      int fromClientId = getInput();
+      scanf("%d", &fromClientId);
       
       printf("Pay to client id:\n");
-      int toClientId = getInput();
+      scanf("%d", &toClientId);
       
-      // Ask for amount of money
+      double amount = -1;
+      printf("Please enter the amount of money you want to send\n");
+      scanf("%lf", &amount);
 
-      // Call makeTransaction
+      makeTransaction(fromClientId, toClientId, amount);
 
-    } else if (option == 5) {
-
+    } else {
       return EXIT_SUCCESS;
     }
 
   }
-
-
-  return EXIT_SUCCESS;
 }

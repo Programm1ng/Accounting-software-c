@@ -3,6 +3,11 @@
 #ifndef TRANSACTION_HEADER
 #define TRANSACTION_HEADER
 
+typedef enum {
+  INCOME = 0,
+  OUTCOME = 1,
+} TRANSACTION_TYPE;
+
 /**
  * @brief Stores information about one transaction
  * 
@@ -10,10 +15,7 @@
 typedef struct {
   int type;
   int otherClientId;
-  int day;
-  int month;
-  int year;
-  float amount;
+  double amount;
 } Transaction;
 
 /**

@@ -18,7 +18,7 @@ typedef struct Client {
   int id;
   char firstname[50];
   char lastname[50];
-  float balance;
+  double balance;
   TransactionsArray *ta;
   struct Client * next;
 } Client;
