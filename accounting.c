@@ -94,6 +94,8 @@ void createNewClient() {
 
   printf("Please enter the balance\n");
   scanf("%lf", &client->balance);
+
+  client->ta = newTransactionsArray();
   
   char *fileName = createFileName(client->id);
 
