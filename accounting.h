@@ -128,9 +128,6 @@ static Client *getClientById(int clientId);
 /**
  * @brief Makes a transaction from a client to another client, returns 0 if successful otherwise returns 1
  * 
- * @param fromClientId 
- * @param toClientId 
- * @param amount 
  * @return int
  */
 int makeTransaction();
